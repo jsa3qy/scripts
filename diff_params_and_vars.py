@@ -52,9 +52,6 @@ for line in file2:
     else:
         try:
             found = re.findall('\$([^\s]+)', line)
-            if 'isUk' in found:
-                print(line)
-                sys.exit(1)
         except AttributeError:
             found='none'
         if len(found) > 0 and found[0] != 'none':
@@ -78,9 +75,10 @@ for i in file2_exclusive_params:
 print('\n')
 print('variables used in ' + str(input[0]) + ": \n")
 for i in file1_let_vars:
-    print(i)
+    print(i.strip("}").strip(":").strip(","))
 print('')
 print('variables used in ' + str(input[0]) + ": \n")
 for i in file2_let_vars:
-    print(i)
+    print(i.strip("}").strip(":").strip(","))
 #tot_diff = list(set(file1_params) - set(file2_params)) + list(set(file2_params) - set(file1_params))
+#any_special_char [!@#$%^&*(),.?":{}|<>]
