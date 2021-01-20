@@ -1,0 +1,45 @@
+#!/usr/bin/bash
+
+build_from_doit () {
+
+  # if we pass arguments to whitelist certain configs
+  if (( $# > 0 )); then
+    echo "excluding configs"
+    if ! [[ "$PWD" == *"src"* ]]; then
+      exclude_configs "$@"
+    else
+      cd ../
+      exclude_configs "$@"
+    fi
+  fi
+
+  #get to right directory if not in src
+  PWD=$(pwd)
+  if ! [[ "$PWD" == *"src"* ]]; then
+    cd src
+  fi
+
+  #get correct current branch name
+  CUR_BRANCH=$(git branch --show-current 2>&1)
+  echo "current branch is" $CUR_BRANCH
+
+  #strip doit from name and add build to end
+  CUR_BRANCH=${CUR_BRANCH%"doit"}
+  NEW_BRANCH=$CUR_BRANCH"build"
+
+  #attempt to checkout new build branch, if it exists already delete it and then try checkout out again
+  echo "checking out new version of" $NEW_BRANCH
+  CO_ATTEMPT=$(git checkout -b $NEW_BRANCH 2>&1)
+  FATAL_MSG="already exists"
+  if [[ $CO_ATTEMPT == *"$FATAL_MSG"* ]];
+  then
+    echo "branch already exists... deleting first"
+    git branch -D $NEW_BRANCH
+    git checkout -b $NEW_BRANCH
+  fi
+
+  #grunt build and commit "build" and force push it up
+  echo "building and pushing to" $NEW_BRANCH
+  grunt build && git add ../ && git commit -m "build" && git push origin $NEW_BRANCH -f
+  echo "done!!!"
+}

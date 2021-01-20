@@ -1,0 +1,47 @@
+#!/usr/bin/python
+
+import glob, argparse
+import os
+from os import path
+import sys
+import re
+
+def main():
+    # configure parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--configs", help="comma separated (no spaces) list of configs to build for")
+    parser.add_argument("--restore", help="restore config names", action="store_true")
+    args = parser.parse_args()
+
+    # if no flags are passed or both valid flags are passed
+    if (not args.configs and not args.restore) or (args.configs and args.restore):
+        print("Error in exclude_configs script: invalid arguments")
+        sys.exit(1)
+
+    # restore case
+    elif args.restore:
+        configs_to_restore = glob.glob("exclude-*")
+        if len(configs_to_restore):
+            print("restoring configs...\n")
+            for config in glob.glob("exclude-*"):
+                src = config
+                dst = config.replace("exclude-", "")
+                print(src + " --> " + dst)
+                os.rename(src, dst)
+        else:
+            print("Attempting to restore confgs to original naming... \nNo configs to restore!")
+        sys.exit(1)
+
+    # changes config names so that only desired config names are proper format to be built
+    elif args.configs:
+        args.configs = args.configs.strip().split(",")
+
+        configs = glob.glob("config.*.json")
+        for config in configs:
+            white_listed = re.compile("("+ ")|(".join(args.configs) + ")")
+            if not len(white_listed.findall(config)):
+                if path.exists(config):
+                    os.rename(config, "exclude-" + config)
+
+if __name__ == "__main__":
+    main()
