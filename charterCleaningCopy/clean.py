@@ -17,19 +17,13 @@ class Entity:
 class Bucket:
     def __init__(self):
         self.locations = []
-        self.packages = []
-        self.tvs = []
-        self.internets = []
+        self.OTHER_TYPE = []
     
     def addEntity(self, eType, entity):
         if eType == "Location":
             self.locations.append(entity)
-        elif eType == "Package":
-            self.packages.append(entity)
-        elif eType == "TV":
-            self.tvs.append(entity)
-        elif eType == "Internet City/State":
-            self.internets.append(entity)
+        elif eType == "OTHER_TYPE":
+            self.OTHER_TYPE.append(entity)
         else:
             print('oops')
     
@@ -37,15 +31,9 @@ class Bucket:
         print("locations: ")
         for location in self.locations:
             print(location.entityid)
-        print("packages: ")
-        for package in self.packages:
-            print(package.entityid)
-        print("tvs: ")
-        for tv in self.tvs:
-            print(tv.entityid)
-        print("internets: ")
-        for internet in self.internets:
-            print(internet.entityid)
+        print("OTHER_TYPE: ")
+        for OTHER_TYPE in self.OTHER_TYPE:
+            print(OTHER_TYPE.entityid)
 
 inv_map = {
     'Alabama': 'AL',
@@ -114,19 +102,9 @@ def csvConvert(city, state, entity):
         if index != len(entity.locations) -1:
             tmpString += ","
     tmpString+="]\",\"["
-    for index,pac in enumerate(entity.packages):
-        tmpString+=pac.entityid
-        if index != len(entity.packages) -1:
-            tmpString += ","
-    tmpString+="]\",\"["
-    for index,inte in enumerate(entity.internets):
-        tmpString+=inte.entityid
-        if index != len(entity.internets) -1:
-            tmpString += ","
-    tmpString+="]\",\"["
-    for index,tv in enumerate(entity.tvs):
-        tmpString+=tv.entityid
-        if index != len(entity.tvs) -1:
+    for index,OTHER_TYPE in enumerate(entity.OTHER_TYPE):
+        tmpString+=OTHER_TYPE.entityid
+        if index != len(entity.OTHER_TYPE) -1:
             tmpString += ","
     tmpString+="]\""
     print(tmpString)
@@ -163,12 +141,9 @@ for entity in entities:
         theMap[entity.city + " " + entity.state].addEntity(entity.type, copy.deepcopy(entity))
 
 print(len(theMap))
-sys.stdout = open("output.csv","w") 
+sys.stdout = open("output1.csv","w") 
 i = 0
-print('City,State,Locations,Packages,Internets,TVs')
+print('City,State,Locations,OTHER_TYPE')
 for key in theMap:
-    if not len(theMap[key].locations) and (len(theMap[key].packages) and len(theMap[key].internets) and len(theMap[key].tvs)):
-            csvConvert(theMap[key].packages[0].city, theMap[key].packages[0].state,theMap[key])
-for key in theMap:
-    if not len(theMap[key].locations) and (not len(theMap[key].packages) or not len(theMap[key].internets) or not len(theMap[key].tvs)):
-        csvConvert(theMap[key].locations[0].city, theMap[key].locations[0].state,theMap[key])
+    if len(theMap[key].locations) and (len(theMap[key].OTHER_TYPE)):
+            csvConvert(theMap[key].OTHER_TYPE[0].city, theMap[key].OTHER_TYPE[0].state,theMap[key])
