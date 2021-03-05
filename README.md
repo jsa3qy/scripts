@@ -1,2 +1,2 @@
 # scripts
-scripts I made
+scripts I made to help with work!
